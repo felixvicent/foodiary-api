@@ -1,7 +1,7 @@
 import { Account } from '@application/entities/Account';
 
 export class AccountItem {
-  private readonly type = 'Account';
+  static readonly type = 'Account';
   private readonly keys: AccountItem.Keys;
 
   constructor(private readonly attrs: AccountItem.Attributes) {
@@ -17,7 +17,7 @@ export class AccountItem {
     return {
       ...this.keys,
       ...this.attrs,
-      type: this.type,
+      type: AccountItem.type,
     };
   }
 
@@ -60,17 +60,17 @@ export namespace AccountItem {
     SK: `ACCOUNT#${string}`;
     GSI1PK: `ACCOUNT#${string}`;
     GSI1SK: `ACCOUNT#${string}`;
-  }
+  };
 
   export type Attributes = {
-    id: string
+    id: string;
     email: string;
     externalId: string | undefined;
     createdAt: string;
-  }
+  };
 
-  export type ItemType = Keys & Attributes & {
-    type: 'Account'
-  }
+  export type ItemType = Keys &
+    Attributes & {
+      type: 'Account';
+    };
 }
-

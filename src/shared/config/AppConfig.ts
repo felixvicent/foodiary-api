@@ -13,6 +13,9 @@ export class AppConfig {
           id: env.COGNITO_CLIENT_ID,
           secret: env.COGNITO_CLIENT_SECRET,
         },
+        pool: {
+          id: env.COGNITO_POOL_ID,
+        },
       },
     };
 
@@ -29,14 +32,17 @@ export namespace AppConfig {
     cognito: {
       client: {
         id: string;
-        secret: string
-      }
-    }
-  }
+        secret: string;
+      };
+      pool: {
+        id: string;
+      };
+    };
+  };
 
   export type Database = {
     dynamodb: {
-      mainTable: string
-    }
-  }
+      mainTable: string;
+    };
+  };
 }

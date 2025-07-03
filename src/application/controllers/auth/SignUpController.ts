@@ -6,20 +6,25 @@ import { SignUpBody, signUpChema } from './schemas/signUpSchema';
 
 @Injectable()
 @Schema(signUpChema)
-export class SignUpController extends Controller<'public', SignUpController.Response> {
+export class SignUpController extends Controller<
+  'public',
+  SignUpController.Response
+> {
   constructor(private readonly signUpUseCase: SignUpUseCase) {
     super();
   }
 
-  protected override async handle(
-    { body }: Controller.Request<'public', SignUpBody>,
-  ): Promise<Controller.Response<SignUpController.Response>> {
-    const { account } = body;
+  protected override async handle({
+    body,
+  }: Controller.Request<'public', SignUpBody>): Promise<
+    Controller.Response<SignUpController.Response>
+  > {
+    const { account, profile } = body;
 
-    const {
-      accessToken,
-      refreshToken,
-    } = await this.signUpUseCase.execute(account);
+    const { accessToken, refreshToken } = await this.signUpUseCase.execute({
+      account,
+      profile,
+    });
 
     return {
       statusCode: 201,
@@ -35,5 +40,5 @@ export namespace SignUpController {
   export type Response = {
     accessToken: string;
     refreshToken: string;
-  }
+  };
 }

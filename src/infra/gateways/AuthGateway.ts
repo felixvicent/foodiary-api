@@ -1,5 +1,12 @@
 import { InvalidRefreshToken } from '@application/errors/application/InvalidRefreshToken';
-import { ConfirmForgotPasswordCommand, ForgotPasswordCommand, GetTokensFromRefreshTokenCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import {
+  AdminDeleteUserCommand,
+  ConfirmForgotPasswordCommand,
+  ForgotPasswordCommand,
+  GetTokensFromRefreshTokenCommand,
+  InitiateAuthCommand,
+  SignUpCommand,
+} from '@aws-sdk/client-cognito-identity-provider';
 import { cognitoClient } from '@infra/clients/cognitoClient';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { AppConfig } from '@shared/config/AppConfig';
@@ -7,7 +14,7 @@ import { createHmac } from 'node:crypto';
 
 @Injectable()
 export class AuthGateway {
-  constructor(private readonly appConfig: AppConfig) { }
+  constructor(private readonly appConfig: AppConfig) {}
 
   async signUp({
     email,
@@ -47,7 +54,10 @@ export class AuthGateway {
 
     const { AuthenticationResult } = await cognitoClient.send(command);
 
-    if (!AuthenticationResult?.RefreshToken || !AuthenticationResult.AccessToken) {
+    if (
+      !AuthenticationResult?.RefreshToken ||
+      !AuthenticationResult.AccessToken
+    ) {
       throw new Error(`Cannot authenticate user: ${email}`);
     }
 
@@ -57,7 +67,9 @@ export class AuthGateway {
     };
   }
 
-  async refreshToken({ refreshToken }: AuthGateway.RefreshTokenParams): Promise<AuthGateway.RefreshTokenResult> {
+  async refreshToken({
+    refreshToken,
+  }: AuthGateway.RefreshTokenParams): Promise<AuthGateway.RefreshTokenResult> {
     try {
       const command = new GetTokensFromRefreshTokenCommand({
         ClientId: this.appConfig.auth.cognito.client.id,
@@ -67,7 +79,10 @@ export class AuthGateway {
 
       const { AuthenticationResult } = await cognitoClient.send(command);
 
-      if (!AuthenticationResult?.RefreshToken || !AuthenticationResult.AccessToken) {
+      if (
+        !AuthenticationResult?.RefreshToken ||
+        !AuthenticationResult.AccessToken
+      ) {
         throw new Error('Cannot refresh token');
       }
 
@@ -108,6 +123,15 @@ export class AuthGateway {
     await cognitoClient.send(command);
   }
 
+  async deleteUser({ externalId }: AuthGateway.DeleteUserParams) {
+    const command = new AdminDeleteUserCommand({
+      UserPoolId: this.appConfig.auth.cognito.pool.id,
+      Username: externalId,
+    });
+
+    await cognitoClient.send(command);
+  }
+
   private getSecretHash(email: string) {
     const { id, secret } = this.appConfig.auth.cognito.client;
     return createHmac('SHA256', secret)
@@ -121,38 +145,42 @@ export namespace AuthGateway {
     email: string;
     password: string;
     internalId: string;
-  }
+  };
 
   export type SignUpResult = {
     externalId: string;
-  }
+  };
 
   export type SignInParams = {
     email: string;
     password: string;
-  }
+  };
 
   export type SignInResult = {
     accessToken: string;
     refreshToken: string;
-  }
+  };
 
   export type RefreshTokenParams = {
     refreshToken: string;
-  }
+  };
 
   export type RefreshTokenResult = {
     accessToken: string;
     refreshToken: string;
-  }
+  };
 
   export type ForgotPasswordParams = {
     email: string;
-  }
+  };
 
   export type ConfirmForgotPasswordParams = {
     email: string;
     confirmationCode: string;
     password: string;
-  }
+  };
+
+  export type DeleteUserParams = {
+    externalId: string;
+  };
 }
