@@ -13,9 +13,9 @@ export class Profile {
 
   weight: number;
 
-  goal: Profile.Goal;
+  readonly goal: Profile.Goal;
 
-  activityLevel: Profile.ActivityLevel;
+  readonly activityLevel: Profile.ActivityLevel;
 
   readonly createdAt: Date;
 
