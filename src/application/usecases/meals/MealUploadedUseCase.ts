@@ -29,6 +29,7 @@ export class MealUploadedUseCase {
 
     await this.mealRepository.save(meal);
     await this.mealsQueueGateway.publish({ accountId, mealId });
+
   }
 }
 

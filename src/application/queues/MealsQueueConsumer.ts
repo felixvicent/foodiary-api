@@ -1,4 +1,5 @@
 import { IQueueConsumer } from '@application/contracts/IQueueConsumer';
+import { ProcessMealUseCase } from '@application/usecases/meals/ProcessMealUseCase';
 import { MealsQueueGateway } from '@infra/gateways/MealsQueueGateway';
 import { Injectable } from '@kernel/decorators/Injectable';
 
@@ -6,7 +7,9 @@ import { Injectable } from '@kernel/decorators/Injectable';
 export class MealsQueueConsumer
   implements IQueueConsumer<MealsQueueGateway.Message>
 {
-  async process(message: MealsQueueGateway.Message): Promise<void> {
-    throw new Error('Method not implemented.');
+  constructor(private readonly processMealUsecase: ProcessMealUseCase){}
+
+  async process({ accountId, mealId }: MealsQueueGateway.Message): Promise<void> {
+    await this.processMealUsecase.execute({ accountId, mealId });
   }
 }

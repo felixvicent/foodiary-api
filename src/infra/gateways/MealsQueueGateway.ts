@@ -13,7 +13,7 @@ export class MealsQueueGateway {
       MessageBody: JSON.stringify(message),
     });
 
-    sqsClient.send(command);
+    await sqsClient.send(command);
   }
 }
 
